@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { Nejat } from "@/types/nejat";
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Keyboard, KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -172,6 +173,7 @@ export default function Index() {
         </BottomSheetModalProvider>
       </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+      <StatusBar style="light"/>
     </GestureHandlerRootView>
   );
 }

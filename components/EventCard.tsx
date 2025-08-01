@@ -1,6 +1,7 @@
 import { Nejat } from '@/types/nejat';
 import { Feather, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Link } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -16,7 +17,6 @@ const EventCard = ({ event }: {event: Nejat}) => {
   return (
     <TouchableOpacity 
       style={styles.cardContainer}
-    //   onPress={() => onPress(event.id)}
       activeOpacity={0.9}
     >
       <View style={styles.card}>
@@ -89,17 +89,19 @@ const EventCard = ({ event }: {event: Nejat}) => {
           )}
 
           {/* Button */}
-          <View style={styles.buttonContainer}>
-            <LinearGradient
-              colors={['#f59e0b', '#eab308']}
-              style={styles.buttonGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.buttonText}>View Details</Text>
-              <Feather name="arrow-right" size={18} color="white" />
-            </LinearGradient>
-          </View>
+          <Link href={`/event/${event.id}`}>
+            <View style={styles.buttonContainer}>
+                <LinearGradient
+                colors={['#f59e0b', '#eab308']}
+                style={styles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                >
+                <Text style={styles.buttonText}>View Details</Text>
+                <Feather name="arrow-right" size={18} color="white" />
+                </LinearGradient>
+            </View>
+          </Link>
         </View>
       </View>
     </TouchableOpacity>

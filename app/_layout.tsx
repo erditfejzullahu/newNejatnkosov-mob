@@ -1,6 +1,7 @@
 import { BottomShelfProvider } from "@/context/bottom-shelf-provider";
 import { CityDateProvider } from "@/context/city-date-change-provider";
 import { QueryProvider } from "@/context/query-provider";
+import { ScrollProvider } from "@/context/scroll-context";
 import { Montserrat_300Light, Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold, Montserrat_900Black, useFonts } from "@expo-google-fonts/montserrat";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -33,11 +34,13 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <QueryProvider>
-        <CityDateProvider>
-          <BottomShelfProvider>
-            <Stack screenOptions={{headerShown: false}}/>
-          </BottomShelfProvider>
-        </CityDateProvider>
+        <ScrollProvider>
+          <CityDateProvider>
+            <BottomShelfProvider>
+              <Stack screenOptions={{headerShown: false}}/>
+            </BottomShelfProvider>
+          </CityDateProvider>
+        </ScrollProvider>
       </QueryProvider>
     </GestureHandlerRootView>
   )
