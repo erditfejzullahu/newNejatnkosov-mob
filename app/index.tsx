@@ -1,12 +1,14 @@
 import CityPicker from "@/components/CityPicker";
+import EventCard from "@/components/EventCard";
 import Header from "@/components/Header";
 import { useBottomShelf } from "@/context/bottom-shelf-provider";
+import { useCityDate } from "@/context/city-date-change-provider";
 import { api } from "@/lib/api";
-import { KosovoCity, Nejat } from "@/types/nejat";
+import { Nejat } from "@/types/nejat";
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { FlatList, Keyboard, KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 type ApiResponse = {
@@ -25,29 +27,39 @@ type InfiniteQueryData = {
 
 export default function Index() {
   const [search, setSearch] = useState('');
-  const [city, setCity] = useState<KosovoCity | 'ALL'>('ALL');
-  const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({
-    start: null,
-    end: null,
-  });
+  const [refreshing, setRefreshing] = useState(false)
+  const queryClient = useQueryClient();
 
+  
   const { isOpen, toggle } = useBottomShelf();
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  
+  const {city, dateRange} = useCityDate();
 
-  // Handle bottom sheet visibility
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await queryClient.cancelQueries({queryKey: ['events', search, city, dateRange]})
+    await queryClient.resetQueries({
+      queryKey: ['events', search, city, dateRange],
+      exact: true
+    })
+    await refetch()
+    setRefreshing(false)
+  }
+
   useEffect(() => {
     if (bottomSheetRef.current) {
       if (isOpen) {
-        bottomSheetRef.current.present(); // Use present() instead of expand()
+        bottomSheetRef.current.present();
       }else{
         bottomSheetRef.current.dismiss();
       }
     }
   }, [isOpen]);
 
-   const limit = 12;
+   const limit = 12;   
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<ApiResponse, Error, InfiniteQueryData>({
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery<ApiResponse, Error, InfiniteQueryData>({
     queryKey: ['events', search, city, dateRange],
     initialPageParam: 1,
     queryFn: async (context) => {
@@ -60,8 +72,14 @@ export default function Index() {
       params.append('page', pageParam.toString());
       params.append('limit', limit.toString());
 
-      const response = await api.get<ApiResponse>(`/nejat?${params.toString()}`);
-      return response.data;
+      try {
+        const response = await api.get<ApiResponse>(`/nejat?${params.toString()}`);
+        console.log('API Response:', response.data); // Add this to debug
+        return response.data;
+      } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+      }
     },
     getNextPageParam: (lastPage, allPages) => {
       const currentPage = allPages.length;
@@ -73,39 +91,57 @@ export default function Index() {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
+  
 
+  
   const handleShowMore = useCallback(() => {
     if (!isLoading && hasNextPage) {
       fetchNextPage();
     }
   }, [isLoading, hasNextPage, fetchNextPage]);
-
+  
   const allEvents = useMemo(() => data?.pages.flatMap((page) => page.data) || [], [data]);
-  // ... (keep your existing query logic)
-
+  console.log(allEvents)
+  
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, backgroundColor: "white" }}>
+        <Header 
+          onSearch={setSearch} 
+        />
         <FlatList 
-          keyboardShouldPersistTaps={"handled"}
-          data={[]}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              {/* <Text>{item.name}</Text> */}
-            </View>
-          )}
-          contentContainerStyle={styles.flatListContent}
-          ListHeaderComponent={
-            <Header 
-              onSearch={setSearch} 
-              onCityChange={setCity} 
-              onDateRangeChange={(start, end) => setDateRange({ start, end })} 
+          className="mt-6"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              // Optional props:
+              colors={['#eab308', '#eab308']} // Android
+              tintColor="#eab308" // iOS
+              title="Pull to refresh" // iOS
+              titleColor="#eab308" // iOS
             />
           }
-          ListFooterComponent={<View style={{ height: 50 }} />} // Spacer instead of modal here
+          keyboardShouldPersistTaps={"handled"}
+          data={allEvents}
+          renderItem={({ item }) => (
+            <EventCard event={item}/>
+          )}
+          contentContainerStyle={styles.flatListContent}
+          ListFooterComponent={() => (
+            <View className="">
+              {isLoading && hasNextPage ? (
+                <Text className="text-center">Please wait...</Text>
+              ) : !isLoading && !hasNextPage ? (
+                <Text className="text-center">No more event are left.</Text>
+              ) : isFetchingNextPage ? (
+                <Text className="text-center">No events found</Text>
+              ) : null}
+            </View>
+          )} // Spacer instead of modal here
           onEndReached={handleShowMore}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0}
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Text>No events found</Text>
@@ -148,6 +184,8 @@ const styles = StyleSheet.create({
   flatListContent: {
     flexGrow: 1,
     paddingBottom: 50, // Add padding for the bottom sheet
+    paddingLeft: 16,
+    paddingRight: 16
   },
   item: {
     padding: 16,

@@ -1,10 +1,10 @@
 // import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cities } from '@/data/cities';
-import { KosovoCity } from '@/types/nejat';
 // import { Search, X } from 'lucide-react';
 import { images } from '@/constants';
 import { useBottomShelf } from '@/context/bottom-shelf-provider';
+import { useCityDate } from '@/context/city-date-change-provider';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Fontisto from '@expo/vector-icons/Fontisto';
@@ -16,43 +16,22 @@ import Input from './Input';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
-  onCityChange: (city: KosovoCity | 'ALL') => void;
-  onDateRangeChange: (startDate: Date | null, endDate: Date | null) => void;
 }
 
-const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
+const Header = ({ onSearch }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCity, setSelectedCity] = useState<KosovoCity | 'ALL'>('ALL');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
 
   const {toggle} = useBottomShelf();
 
-  const handleCityChange = useCallback(
-    (value: string) => {
-      setSelectedCity(value as KosovoCity | 'ALL');
-      onCityChange(value as KosovoCity | 'ALL');
-    },
-    [onCityChange]
-  );
-
-  const handleDateChange = useCallback(() => {
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
-    onDateRangeChange(start, end);
-  }, [startDate, endDate, onDateRangeChange]);
+  const {city, dateRange, resetFilters} = useCityDate()
 
   const clearFilters = useCallback(() => {
     setSearchQuery('');
-    setSelectedCity('ALL');
-    setStartDate('');
-    setEndDate('');
+    resetFilters();
     onSearch('');
-    onCityChange('ALL');
-    onDateRangeChange(null, null);
-  }, [onSearch, onCityChange, onDateRangeChange]);
+  }, [onSearch]);
 
-  const hasActiveFilters = searchQuery || selectedCity !== 'ALL' || startDate || endDate;
+  const hasActiveFilters = searchQuery || city !== 'ALL' || dateRange.start || dateRange.end;
 
   return (
     <View className="bg-white w-full">
@@ -247,35 +226,35 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
             {/* </View> */}
 
             {/* Active Filters Summary - Desktop */}
-            <View className="hidden md:block">
               {hasActiveFilters && (
-                <View className="flex items-center justify-center gap-2 flex-wrap">
-                  <Text className="text-sm text-gray-300">Active filters:</Text>
+              <View className="mt-4">
+                <View className="flex-row items-center justify-center gap-2 flex-wrap">
+                  <Text className="text-sm text-white">Active filters:</Text>
                   {searchQuery && (
                     <Text className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">
                       {searchQuery}
                     </Text>
                   )}
-                  {selectedCity !== 'ALL' && (
+                  {city !== 'ALL' && (
                     <Text className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200">
-                      {cities.find(c => c.value === selectedCity)?.label}
+                      {cities.find(c => c.value === city)?.label}
                     </Text>
                   )}
-                  {(startDate || endDate) && (
+                  {(dateRange.start || dateRange.end) && (
                     <Text className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 border border-green-200">
                       Date Range
                     </Text>
                   )}
                   <TouchableOpacity
                     onPress={clearFilters}
-                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                    className="text-yellow-600 items-center hover:text-yellow-700 flex-row gap-2 hover:bg-yellow-50"
                   >
-                    <Fontisto name="close-a" size={24} color="black" />
-                    <Text>Clear</Text>
+                    <Fontisto name="close-a" size={14} color="#fff" />
+                    <Text className='text-white'>Clear</Text>
                   </TouchableOpacity>
                 </View>
+              </View>
               )}
-            </View>
           </View>
         </View>
       </View>
