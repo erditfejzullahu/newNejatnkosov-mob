@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import { useBottomShelf } from "@/context/bottom-shelf-provider";
 import { api } from "@/lib/api";
 import { KosovoCity, Nejat } from "@/types/nejat";
-import BottomSheet from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
@@ -30,23 +30,25 @@ export default function Index() {
     end: null,
   });
 
-  const {isOpen} = useBottomShelf();
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const { isOpen, toggle } = useBottomShelf();
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
+  // Handle bottom sheet visibility
   useEffect(() => {
-    if(bottomSheetRef.current){
-      if(isOpen){
-        bottomSheetRef.current.close();
-      }else{
-        bottomSheetRef.current.expand();
+    if (bottomSheetRef.current) {
+      if (isOpen) {
+        bottomSheetRef.current.present(); // Use present() instead of expand()
       }
     }
-  }, [isOpen])
-  
+  }, [isOpen]);
 
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const handlePositionChange = (index: number) => {
+    if(index === -1){
+      toggle()
+    }
+  }
 
-  const limit = 12;
+   const limit = 12;
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<ApiResponse, Error, InfiniteQueryData>({
     queryKey: ['events', search, city, dateRange],
@@ -82,18 +84,16 @@ export default function Index() {
   }, [isLoading, hasNextPage, fetchNextPage]);
 
   const allEvents = useMemo(() => data?.pages.flatMap((page) => page.data) || [], [data]);
-
-  const showLoading = isLoading && !data;
-  const showEmptyState = allEvents.length === 0 && !isLoading;
+  // ... (keep your existing query logic)
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
         <FlatList 
-          data={allEvents}
+          data={[]}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text>{item.name}</Text>
+              {/* <Text>{item.name}</Text> */}
             </View>
           )}
           contentContainerStyle={styles.flatListContent}
@@ -104,24 +104,7 @@ export default function Index() {
               onDateRangeChange={(start, end) => setDateRange({ start, end })} 
             />
           }
-          ListFooterComponent={
-            <View style={styles.footerContainer}>
-              <BottomSheet
-                // detached
-                enableDynamicSizing={false}
-                ref={bottomSheetRef}
-                index={0}
-                snapPoints={['100%']}
-                enablePanDownToClose
-                style={styles.bottomSheet}
-              >
-                <View style={styles.bottomSheetContent}>
-                  <Text>Test</Text>
-                </View>
-              </BottomSheet>
-            </View>
-          }
-          ListFooterComponentStyle={styles.footerStyle}
+          ListFooterComponent={<View style={{ height: 50 }} />} // Spacer instead of modal here
           onEndReached={handleShowMore}
           onEndReachedThreshold={0.5}
           ListEmptyComponent={
@@ -130,6 +113,29 @@ export default function Index() {
             </View>
           }
         />
+
+        {/* Move BottomSheetModal outside FlatList */}
+        <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          index={0} // Start expanded
+          snapPoints={["30%", '50%']}
+          enableDynamicSizing={false}
+          enablePanDownToClose={true}
+          onChange={handlePositionChange}
+          style={styles.bottomSheet}
+          backdropComponent={({ style }) => (
+            <View 
+              style={[style, { backgroundColor: 'rgba(0,0,0,0.5)' }]} 
+              onTouchEnd={() => bottomSheetRef.current?.dismiss()}
+            />
+          )}
+        >
+          <View style={styles.bottomSheetContent}>
+            <Text>Test Content</Text>
+          </View>
+        </BottomSheetModal>
+        </BottomSheetModalProvider>
       </View>
     </GestureHandlerRootView>
   );
@@ -142,18 +148,12 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     flexGrow: 1,
+    paddingBottom: 50, // Add padding for the bottom sheet
   },
   item: {
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-  },
-  footerContainer: {
-    flex: 1,
-  },
-  footerStyle: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
   },
   bottomSheet: {
     shadowColor: '#000',
