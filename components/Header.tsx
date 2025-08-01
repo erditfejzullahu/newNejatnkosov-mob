@@ -113,7 +113,7 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
             {/* Search Bar - Mobile First */}
             <View className="mb-4">
               <View className="relative w-full max-w-2xl mx-auto">
-                <Feather name="search" size={24} color={"#fff"} className='absolute z-50 top-2.5 left-2' />
+                <Feather name="search" size={24} color={"#fff"} className='absolute z-50 top-3 left-2' />
                 {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" /> */}
                 <Input
                   placeholder="Search events, venues, or performers..."

@@ -1,3 +1,4 @@
+import CityPicker from "@/components/CityPicker";
 import Header from "@/components/Header";
 import { useBottomShelf } from "@/context/bottom-shelf-provider";
 import { api } from "@/lib/api";
@@ -5,7 +6,7 @@ import { KosovoCity, Nejat } from "@/types/nejat";
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 type ApiResponse = {
@@ -38,15 +39,11 @@ export default function Index() {
     if (bottomSheetRef.current) {
       if (isOpen) {
         bottomSheetRef.current.present(); // Use present() instead of expand()
+      }else{
+        bottomSheetRef.current.dismiss();
       }
     }
   }, [isOpen]);
-
-  const handlePositionChange = (index: number) => {
-    if(index === -1){
-      toggle()
-    }
-  }
 
    const limit = 12;
 
@@ -88,8 +85,10 @@ export default function Index() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, backgroundColor: "white" }}>
         <FlatList 
+          keyboardShouldPersistTaps={"handled"}
           data={[]}
           renderItem={({ item }) => (
             <View style={styles.item}>
@@ -122,21 +121,21 @@ export default function Index() {
           snapPoints={["30%", '50%']}
           enableDynamicSizing={false}
           enablePanDownToClose={true}
-          onChange={handlePositionChange}
           style={styles.bottomSheet}
           backdropComponent={({ style }) => (
             <View 
               style={[style, { backgroundColor: 'rgba(0,0,0,0.5)' }]} 
-              onTouchEnd={() => bottomSheetRef.current?.dismiss()}
+              onTouchEnd={() => toggle()}
             />
           )}
         >
           <View style={styles.bottomSheetContent}>
-            <Text>Test Content</Text>
+            <CityPicker />
           </View>
         </BottomSheetModal>
         </BottomSheetModalProvider>
-      </View>
+      </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </GestureHandlerRootView>
   );
 }
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f9f9f9',
   },
   emptyState: {
     flex: 1,
