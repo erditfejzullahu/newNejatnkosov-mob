@@ -1,7 +1,9 @@
+import { BottomShelfProvider } from "@/context/bottom-shelf-provider";
 import { QueryProvider } from "@/context/query-provider";
 import { Montserrat_300Light, Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold, Montserrat_900Black, useFonts } from "@expo-google-fonts/montserrat";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import '../assets/global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -28,8 +30,12 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryProvider>
-      <Stack screenOptions={{headerShown: false}}/>
-    </QueryProvider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <QueryProvider>
+        <BottomShelfProvider>
+          <Stack screenOptions={{headerShown: false}}/>
+        </BottomShelfProvider>
+      </QueryProvider>
+    </GestureHandlerRootView>
   )
 }

@@ -3,12 +3,17 @@
 import { cities } from '@/data/cities';
 import { KosovoCity } from '@/types/nejat';
 // import { Search, X } from 'lucide-react';
+import { images } from '@/constants';
+import { useBottomShelf } from '@/context/bottom-shelf-provider';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Fontisto from '@expo/vector-icons/Fontisto';
+import { Image } from 'expo-image';
 import { useCallback, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import Input from './Input';
+
 interface HeaderProps {
   onSearch: (query: string) => void;
   onCityChange: (city: KosovoCity | 'ALL') => void;
@@ -20,7 +25,8 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
   const [selectedCity, setSelectedCity] = useState<KosovoCity | 'ALL'>('ALL');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const {toggle} = useBottomShelf();
 
   const handleCityChange = useCallback(
     (value: string) => {
@@ -49,52 +55,53 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
   const hasActiveFilters = searchQuery || selectedCity !== 'ALL' || startDate || endDate;
 
   return (
-    <View className="bg-white">
+    <View className="bg-white w-full">
       {/* Hero Section */}
       <View className="relative overflow-hidden">
         {/* Background Image with Gradient Overlay */}
-        <View className="absolute inset-0 bg-black">
+        <View className="absolute inset-0 bg-white">
           <Image
-            src="/prishtinaphoto.webp"
+            source={images.prishtinaPhoto}
             alt="Prishtina"
-            className="object-cover"
+            style={{width: "100%", height: "100%"}}
+            contentFit='cover'
           />
           {/* Dark gradient overlay for better readability */}
           <View className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
         </View>
         
         {/* Content */}
-        <View className="relative px-4 py-8 md:py-12 lg:py-16">
+        <View className="relative px-4 py-20 pb-10">
           <View className="max-w-6xl mx-auto">
             {/* Logo and Title */}
             <View className="text-center mb-8">
               <View className="relative inline-block">
                 {/* Decorative stars */}
                 <View className="absolute -top-2 -left-4 text-yellow-400 animate-pulse">
-                  <Svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <Svg width={24} height={24} fill="#facc15" viewBox="0 0 24 24">
                     <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </Svg>
                 </View>
                 {/* <View className="absolute -top-1 -right-4 text-yellow-300 animate-pulse" style={{animationDelay: '0.5s'}}> */}
-                  <View className="absolute -top-1 -right-4 text-yellow-300 animate-pulse" ></View>
-                  <Svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <View className="absolute -top-1 -right-4 text-yellow-300 animate-pulse" >
+                  <Svg width={20} height={20} fill="#facc15" viewBox="0 0 24 24">
                     <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </Svg>
-                </View>
+                  </View>
                 {/* <View className="absolute -bottom-2 left-1/4 text-yellow-500 animate-pulse" style={{animationDelay: '1s'}}> */}
                 <View className="absolute -bottom-2 left-1/4 text-yellow-500 animate-pulse" >
-                  <Svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <Svg width={16} height={16} fill="#facc15" viewBox="0 0 24 24">
                     <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </Svg>
                 </View>
                 {/* <View className="absolute -bottom-1 right-1/4 text-yellow-400 animate-pulse" style={{animationDelay: '1.5s'}}> */}
                 <View className="absolute -bottom-1 right-1/4 text-yellow-400 animate-pulse">
-                  <Svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <Svg width={12} height={12} className="w-3 h-3" fill="#facc15" viewBox="0 0 24 24">
                     <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </Svg>
                 </View>
                 
-                <Text className="text-3xl pointer-events-none md:text-4xl lg:text-5xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-lg relative z-10">
+                <Text className="text-4xl text-center text-yellow-500 pointer-events-none md:text-4xl lg:text-5xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-yellow-300 bg-clip-text drop-shadow-lg relative z-10">
                   nejatnkosov.com
                 </Text>
               </View>
@@ -104,9 +111,9 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
             </View>
 
             {/* Search Bar - Mobile First */}
-            <View className="mb-6">
-              <View className="relative max-w-2xl mx-auto">
-                <Feather name="search" size={24} color="black" />
+            <View className="mb-4">
+              <View className="relative w-full max-w-2xl mx-auto">
+                <Feather name="search" size={24} color={"#fff"} className='absolute z-50 top-2.5 left-2' />
                 {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" /> */}
                 <Input
                   placeholder="Search events, venues, or performers..."
@@ -115,11 +122,19 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
                     setSearchQuery(e);
                     onSearch(e);
                   }}
-                  className="pl-10 pr-4 py-3 bg-white/95 backdrop-blur-sm border-gray-200 text-gray-900 placeholder:text-gray-500 focus:bg-white focus:border-yellow-400 focus:ring-yellow-400 transition-all duration-200 shadow-lg"
+                  containerClass='w-full'
+                  inputClass='pl-10 pr-4 pb-4 py-3 bg-white/60 backdrop-blur-sm border-gray-200 text-gray-900 placeholder:text-gray-500 focus:bg-white focus:border-yellow-400 focus:ring-yellow-400 transition-all duration-200 shadow-lg'
                 />
               </View>
             </View>
 
+            {/* filters */}
+            <View className='justify-center mx-auto'>
+              <TouchableOpacity onPress={() => toggle()} className='bg-white rounded-md flex-row items-center justify-center self-start px-4 py-1 gap-1'>
+                  <Text>Filters</Text>
+                  <AntDesign name="filter" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
             {/* Filter Button - Mobile */}
             {/* <View className="flex justify-center mb-4"> */}
               {/* <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -256,7 +271,7 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
                     className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
                   >
                     <Fontisto name="close-a" size={24} color="black" />
-                    Clear
+                    <Text>Clear</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -264,7 +279,7 @@ const Header = ({ onSearch, onCityChange, onDateRangeChange }: HeaderProps) => {
           </View>
         </View>
       </View>
-    // </View>
+    </View>
   );
 }
 

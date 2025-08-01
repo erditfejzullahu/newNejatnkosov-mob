@@ -10,14 +10,14 @@ interface ExpoInputProps extends TextInputProps {
   labelClass?: string;
 }
 
-const Input: React.FC<ExpoInputProps> = ({
+const Input= ({
   label,
 //   iconName,
   containerClass = '',
   inputClass = '',
   labelClass = '',
   ...props
-}) => {
+}: ExpoInputProps) => {
   return (
     <View className={`mb-4 w-full ${containerClass}`}>
       {label && (
@@ -26,7 +26,7 @@ const Input: React.FC<ExpoInputProps> = ({
         </Text>
       )}
       
-      <View className="flex-row items-center border border-gray-300 rounded-lg px-3">
+      <View className="flex-row items-center border border-gray-300 rounded-lg">
         {/* {iconName && (
           <MaterialIcons 
             name={iconName} 
@@ -35,8 +35,8 @@ const Input: React.FC<ExpoInputProps> = ({
           />
         )} */}
         <TextInput
-          className={`flex-1 h-12 text-base text-gray-900 ${inputClass}`}
-          placeholderTextColor="#9CA3AF" // gray-400
+          className={`flex-1 text-base text-gray-900 ${inputClass}`}
+          placeholderTextColor="#4b5563" // gray-400
           {...props}
         />
       </View>
