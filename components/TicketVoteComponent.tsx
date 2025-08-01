@@ -164,6 +164,11 @@ const TicketVoteComponent = () => {
         }
     };
 
+    const deleteImage = async (onChange: (value: string) => void) => {
+        setImagePreview(null);
+        onChange("")
+    }
+
     return (
         <View style={styles.container}>
             {/* Ticket Modal */}
@@ -310,10 +315,15 @@ const TicketVoteComponent = () => {
                                             </TouchableOpacity>
 
                                             {imagePreview && (
-                                                <Image
-                                                    source={{ uri: imagePreview }}
-                                                    style={styles.imagePreview}
-                                                />
+                                                <View className='relative'>
+                                                    <Image
+                                                        source={{ uri: imagePreview }}
+                                                        style={styles.imagePreview}
+                                                    />
+                                                    <TouchableOpacity onPress={() => deleteImage(field.onChange)} className='absolute -right-2 top-1'>
+                                                        <AntDesign name="closecircle" size={24} color="red" />
+                                                    </TouchableOpacity>
+                                                </View>
                                             )}
                                         </>
                                     )}
