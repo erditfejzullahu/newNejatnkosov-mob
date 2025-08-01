@@ -1,6 +1,7 @@
 import CityPicker from "@/components/CityPicker";
 import EventCard from "@/components/EventCard";
 import Header from "@/components/Header";
+import TicketVoteComponent from "@/components/TicketVoteComponent";
 import { useBottomShelf } from "@/context/bottom-shelf-provider";
 import { useCityDate } from "@/context/city-date-change-provider";
 import { api } from "@/lib/api";
@@ -107,73 +108,76 @@ export default function Index() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, backgroundColor: "white" }}>
-        <Header 
-          onSearch={setSearch} 
-        />
-        <FlatList 
-          className="mt-6"
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              // Optional props:
-              colors={['#eab308', '#eab308']} // Android
-              tintColor="#eab308" // iOS
-              title="Pull to refresh" // iOS
-              titleColor="#eab308" // iOS
-            />
-          }
-          keyboardShouldPersistTaps={"handled"}
-          data={allEvents}
-          renderItem={({ item }) => (
-            <EventCard event={item}/>
-          )}
-          contentContainerStyle={styles.flatListContent}
-          ListFooterComponent={() => (
-            <View className="">
-              {isLoading && hasNextPage ? (
-                <Text className="text-center">Please wait...</Text>
-              ) : !isLoading && !hasNextPage ? (
-                <Text className="text-center">No more event are left.</Text>
-              ) : isFetchingNextPage ? (
-                <Text className="text-center">No events found</Text>
-              ) : null}
-            </View>
-          )} // Spacer instead of modal here
-          onEndReached={handleShowMore}
-          onEndReachedThreshold={0}
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Text>No events found</Text>
-            </View>
-          }
-        />
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, backgroundColor: "white" }}>
+          <Header 
+            onSearch={setSearch} 
+          />
+          <FlatList 
+            className="mt-6"
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                // Optional props:
+                colors={['#eab308', '#eab308']} // Android
+                tintColor="#eab308" // iOS
+                title="Pull to refresh" // iOS
+                titleColor="#eab308" // iOS
+              />
+            }
+            keyboardShouldPersistTaps={"handled"}
+            data={allEvents}
+            renderItem={({ item }) => (
+              <EventCard event={item}/>
+            )}
+            contentContainerStyle={styles.flatListContent}
+            ListFooterComponent={() => (
+              <View className="">
+                {isLoading && hasNextPage ? (
+                  <Text className="text-center">Please wait...</Text>
+                ) : !isLoading && !hasNextPage ? (
+                  <Text className="text-center">No more event are left.</Text>
+                ) : isFetchingNextPage ? (
+                  <Text className="text-center">No events found</Text>
+                ) : null}
+              </View>
+            )} // Spacer instead of modal here
+            onEndReached={handleShowMore}
+            onEndReachedThreshold={0}
+            ListEmptyComponent={
+              <View style={styles.emptyState}>
+                <Text>No events found</Text>
+              </View>
+            }
+          />
 
-        {/* Move BottomSheetModal outside FlatList */}
-        <BottomSheetModalProvider>
-        <BottomSheetModal
-          ref={bottomSheetRef}
-          index={0} // Start expanded
-          snapPoints={["30%", '50%']}
-          enableDynamicSizing={false}
-          enablePanDownToClose={true}
-          style={styles.bottomSheet}
-          backdropComponent={({ style }) => (
-            <View 
-              style={[style, { backgroundColor: 'rgba(0,0,0,0.5)' }]} 
-              onTouchEnd={() => toggle()}
-            />
-          )}
-        >
-          <View style={styles.bottomSheetContent}>
-            <CityPicker />
-          </View>
-        </BottomSheetModal>
-        </BottomSheetModalProvider>
-      </KeyboardAvoidingView>
+          {/* Move BottomSheetModal outside FlatList */}
+          <BottomSheetModalProvider>
+          <BottomSheetModal
+            ref={bottomSheetRef}
+            index={0} // Start expanded
+            snapPoints={["30%", '50%']}
+            enableDynamicSizing={false}
+            enablePanDownToClose={true}
+            style={styles.bottomSheet}
+            backdropComponent={({ style }) => (
+              <View 
+                style={[style, { backgroundColor: 'rgba(0,0,0,0.5)' }]} 
+                onTouchEnd={() => toggle()}
+              />
+            )}
+          >
+            <View style={styles.bottomSheetContent}>
+              <CityPicker />
+            </View>
+          </BottomSheetModal>
+          </BottomSheetModalProvider>
+          <TicketVoteComponent />
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+
       <StatusBar style="light"/>
+
     </GestureHandlerRootView>
   );
 }

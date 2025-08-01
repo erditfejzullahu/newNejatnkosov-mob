@@ -32,7 +32,7 @@ const PerformerCard = React.memo(({ performer }: PerformerCardProps) => {
           />
         </View>
         <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }} className='flex-wrap gap-1'>
             <Text style={styles.nickname} numberOfLines={1}>{performer.nickname}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <Feather name="star" color="#ca8a04" size={16} />
