@@ -1,23 +1,22 @@
 // ScrollContext.tsx
 import React, { createContext, useContext, useRef } from 'react';
-import { ScrollView } from 'react-native';
 
 type ScrollContextType = {
   scrollToFooter: () => void;
-  scrollViewRef: React.RefObject<ScrollView | null>;
+  viewRef: React.RefObject<any | null>;
 };
 
 const ScrollContext = createContext<ScrollContextType | undefined>(undefined);
 
 export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
-  const scrollViewRef = useRef<ScrollView>(null);
+  const viewRef = useRef<any>(null);
 
   const scrollToFooter = () => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
+    viewRef.current?.scrollToEnd({ animated: true });
   };
 
   return (
-    <ScrollContext.Provider value={{ scrollToFooter, scrollViewRef }}>
+    <ScrollContext.Provider value={{ scrollToFooter, viewRef }}>
       {children}
     </ScrollContext.Provider>
   );

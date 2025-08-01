@@ -6,6 +6,7 @@ import { Montserrat_300Light, Montserrat_400Regular, Montserrat_500Medium, Monts
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Toast from "react-native-toast-message";
 import '../assets/global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -32,16 +33,19 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      <QueryProvider>
-        <ScrollProvider>
-          <CityDateProvider>
-            <BottomShelfProvider>
-              <Stack screenOptions={{headerShown: false}}/>
-            </BottomShelfProvider>
-          </CityDateProvider>
-        </ScrollProvider>
-      </QueryProvider>
-    </GestureHandlerRootView>
+    <>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <QueryProvider>
+          <ScrollProvider>
+            <CityDateProvider>
+              <BottomShelfProvider>
+                <Stack screenOptions={{headerShown: false}}/>
+              </BottomShelfProvider>
+            </CityDateProvider>
+          </ScrollProvider>
+        </QueryProvider>
+      </GestureHandlerRootView>
+      <Toast />
+    </>
   )
 }

@@ -15,13 +15,7 @@ const SubscribeForm = ({ venueId }: {venueId: string}) => {
 
   const subscribeFormSchema = z.object({
     email: z.email(),
-    phoneNumber: addNumberToo ? z.coerce.string()
-      .trim()
-      .min(8, { message: "Phone number too short" })
-      .max(15, { message: "Phone number too long" })
-      .regex(/^\+?[\d\s\-]+$/, { 
-        message: "Invalid phone number format" 
-      }) : z.string().optional(),
+    phoneNumber: z.string().optional(),
   });
 
   const { control, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<z.infer<typeof subscribeFormSchema>>({
@@ -49,7 +43,9 @@ const SubscribeForm = ({ venueId }: {venueId: string}) => {
         });
         reset();
       }
-    } catch {
+    } catch(error: any) {
+        console.log(error.response.data);
+        
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -137,7 +133,7 @@ const SubscribeForm = ({ venueId }: {venueId: string}) => {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  style={{ flex: 1, height: 48, color: '#111827' }}
+                  style={{ flex: 1, height: 48, color: '#111827', paddingLeft: 6 }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />

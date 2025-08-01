@@ -7,12 +7,12 @@ import { Nejat } from '@/types/nejat';
 import { useQuery } from '@tanstack/react-query';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 
 const Neja = () => {
   const router = useRouter();
 
-  const {scrollViewRef} = useScroll();
+  const {viewRef} = useScroll();
   const {eventId} = useLocalSearchParams();
   const {data, isLoading, isError, refetch} = useQuery({
     queryKey: ['event'],
@@ -41,10 +41,12 @@ const Neja = () => {
   )
 
   return (
-    <ScrollView ref={scrollViewRef} className='w-full'>
-      <EventStatics id={eventId as string} event={data}/>
-      <Footer event={data}/>
-    </ScrollView>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className='w-full'>
+      <ScrollView keyboardShouldPersistTaps="handled" ref={viewRef}>
+        <EventStatics id={eventId as string} event={data}/>
+        <Footer event={data}/>
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
 

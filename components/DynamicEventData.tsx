@@ -117,7 +117,6 @@ const DynamicEventDataContent = React.memo(({ id }: DynamicEventDataContentProps
             onPress={scrollToFooter}
             style={styles.subscribeButton}
             className='items-center'
-            // textStyle={styles.subscribeText}
           >
             <Text className='text-white'>Subscribe</Text>
             <Feather name="chevron-down" color="white" size={16} style={{ marginLeft: 4 }} />

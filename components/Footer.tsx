@@ -11,7 +11,7 @@ const Footer = ({ event }: {event: Nejat}) => {
       colors={['#eab308', '#ca8a04']}
       style={{ paddingVertical: 48 }}
     >
-      <View style={{ maxWidth: 800, marginHorizontal: 'auto', paddingHorizontal: 16 }}>
+      <View style={{ width: "100%", marginHorizontal: 'auto', paddingHorizontal: 16 }}>
         {/* Header */}
         <View style={{ alignItems: 'center', marginBottom: 32 }}>
           <View style={{ 
